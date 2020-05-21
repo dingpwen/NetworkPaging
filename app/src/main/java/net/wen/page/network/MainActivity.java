@@ -2,23 +2,14 @@ package net.wen.page.network;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
-    private FriendViewModel viewModel;
     private FriendListAdapter mAdaper;
 
     @Override
@@ -27,9 +18,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initListView();
 
-        viewModel = new ViewModelProvider(this).get(FriendViewModel.class);
+        final FriendViewModel viewModel = new ViewModelProvider(this).get(FriendViewModel.class);
         viewModel.friendList.observe(this, mAdaper::submitList);
         //viewModel.invalidateDataSource();
+        viewModel.loadStatus.observe(this, loadStatus -> mAdaper.updateLoadStatus(loadStatus));
     }
 
     private void initListView() {

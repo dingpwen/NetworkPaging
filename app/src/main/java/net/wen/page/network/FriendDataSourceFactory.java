@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
 
 public class FriendDataSourceFactory extends DataSource.Factory<Integer, FriendModel> {
-    private MutableLiveData<FriendDataSource> friendDataSource = new MutableLiveData<>();
+    MutableLiveData<FriendDataSource> friendDataSource = new MutableLiveData<>();
 
     @NonNull
     @Override

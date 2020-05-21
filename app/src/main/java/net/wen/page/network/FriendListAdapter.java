@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class FriendListAdapter extends PagedListAdapter<FriendModel, FriendListAdapter.FriendViewHolder> {
     private Context mContext;
-    protected FriendListAdapter(@NonNull Context context, @NonNull DiffUtil.ItemCallback<FriendModel> diffCallback) {
+    FriendListAdapter(@NonNull Context context, @NonNull DiffUtil.ItemCallback<FriendModel> diffCallback) {
         super(diffCallback);
         mContext = context;
     }
@@ -25,6 +25,10 @@ public class FriendListAdapter extends PagedListAdapter<FriendModel, FriendListA
         View view =
                 LayoutInflater.from(mContext).inflate(R.layout.friend_list_item, parent, false);
         return new FriendViewHolder(view);
+    }
+
+    void updateLoadStatus(LoadStatus loadStatus) {
+        //todo something
     }
 
     @Override
@@ -45,6 +49,9 @@ public class FriendListAdapter extends PagedListAdapter<FriendModel, FriendListA
         }
 
         void bind(FriendModel friend) {
+            if(friend == null) {
+                return;
+            }
             number.setVisibility(View.GONE);
             if(!friend.name.isEmpty()) {
                 name.setText(friend.name);

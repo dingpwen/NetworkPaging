@@ -3,6 +3,7 @@ package net.wen.page.network;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 import androidx.paging.PageKeyedDataSource;
 
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,9 @@ import okhttp3.Response;
 public class FriendDataSource extends PageKeyedDataSource<Integer, FriendModel> {
     private static final String BASE_URL = "http://172.16.200.206:5000/friend/pagelist";
     private static final String TOKEN = "8+B30mCUJ8AbOyO3ZYz7lWG+zBUEIHHxS3nknBJNn/s=";
+
+    MutableLiveData<LoadStatus> loadStaus = new MutableLiveData<>();
+    MutableLiveData<LoadStatus> initStaus = new MutableLiveData<>();
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Integer, FriendModel> callback) {
         //List<FriendModel> items = fetchItems(0, params.requestedLoadSize);
@@ -30,10 +34,12 @@ public class FriendDataSource extends PageKeyedDataSource<Integer, FriendModel> 
         map.put("start", "0");
         map.put("pagesize", "" + params.requestedLoadSize);
         map.put("token", TOKEN);
+        initStaus.postValue(new LoadStatus.Loading(""));
         OkHttpUtil.baseGet(BASE_URL, map, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                initStaus.postValue(new LoadStatus.Error(e));
             }
 
             @Override
@@ -57,9 +63,12 @@ public class FriendDataSource extends PageKeyedDataSource<Integer, FriendModel> 
                     }
                     if(items.size() > 0) {
                         callback.onResult(items, 0, 1);
+                        initStaus.postValue(new LoadStatus.Success(200));
+                    } else {
+                        initStaus.postValue(new LoadStatus.NoMore(""));
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    initStaus.postValue(new LoadStatus.Error(e));
                 }
             }
         });
@@ -77,10 +86,11 @@ public class FriendDataSource extends PageKeyedDataSource<Integer, FriendModel> 
         map.put("start", "" + params.key);
         map.put("pagesize", "" + params.requestedLoadSize);
         map.put("token", TOKEN);
+        loadStaus.postValue(new LoadStatus.Loading(""));
         OkHttpUtil.baseGet(BASE_URL, map, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                //todo
+                loadStaus.postValue(new LoadStatus.Error(e));
             }
 
             @Override
@@ -103,9 +113,12 @@ public class FriendDataSource extends PageKeyedDataSource<Integer, FriendModel> 
                     }
                     if(items.size() > 0) {
                         callback.onResult(items, params.key + 1);
+                        loadStaus.postValue(new LoadStatus.Success(200));
+                    } else {
+                        loadStaus.postValue(new LoadStatus.NoMore(""));
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    loadStaus.postValue(new LoadStatus.Error(e));
                 }
             }
         });
